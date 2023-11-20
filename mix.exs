@@ -28,11 +28,17 @@ defmodule Telephony.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      # {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      # {:excoveralls, "~> 0.10", only: :test},
+      # {:sobelow, "~> 0.8", only: :dev},
+      # {:dialyxir, "~> 0.5.0", only: [:dev, :test], runtime: false},
+      # {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
+
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
-      {:sobelow, "~> 0.8", only: :dev},
-      {:dialyxir, "~> 0.5.0", only: [:dev, :test], runtime: false},
-      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 end
