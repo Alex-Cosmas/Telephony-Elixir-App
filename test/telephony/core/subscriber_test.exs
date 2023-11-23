@@ -1,7 +1,7 @@
 defmodule Telephony.Core.SubscriberTest do
   use ExUnit.Case
   # doctest Subscriber.Subscriber
-  alias Telephony.Core.{Subscriber, Prepaid, Postpaid}
+  alias Telephony.Core.{Postpaid, Prepaid, Subscriber}
 
   test "create a prepaid subscriber" do
     # Given
