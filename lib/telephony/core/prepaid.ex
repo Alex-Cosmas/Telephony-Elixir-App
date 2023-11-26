@@ -1,12 +1,32 @@
 defmodule Telephony.Core.Prepaid do
-  alias Telephony.Core.Call
+  alias Telephony.Core.{Call, Recharge}
   defstruct credits: 0, recharges: []
   @price_per_minute 1.45
 
-  def make_call(subscriber, time_spent, date) do
-    subscriber
-    |> update_credit_spent(time_spent)
-    |> add_new_call(time_spent, date)
+  def make_call(%{subscriber_type: subscriber_type} = subscriber, time_spent, date) do
+    if is_subscriber_has_credits(subscriber_type, time_spent) do
+      subscriber
+      |> update_credit_spent(time_spent)
+      |> add_new_call(time_spent, date)
+    else
+      {:error, "Subsriber does not have credit"}
+    end
+  end
+
+  def make_recharge(%{subscriber_type: subscriber_type} = subscriber, value, date) do
+    recharge = Recharge.new(value, date)
+
+    subscriber_type = %{
+      subscriber_type
+      | recharges: subscriber_type.recharges ++ [recharge],
+        credits: subscriber_type.credits + value
+    }
+
+    %{subscriber | subscriber_type: subscriber_type}
+  end
+
+  defp is_subscriber_has_credits(subscriber_type, time_spent) do
+    subscriber_type.credits >= @price_per_minute * time_spent
   end
 
   defp update_credit_spent(%{subscriber_type: subscriber_type} = subscriber, time_spent) do
