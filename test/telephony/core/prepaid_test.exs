@@ -69,8 +69,8 @@ defmodule Telephony.Core.PrepaidTest do
   end
 
   test "print invoice" do
-    date = ~D[2023-11-26]
-    last_month = ~D[2023-11-26]
+    date = ~D[2023-11-01]
+    last_month = ~D[2023-10-01]
 
     subscriber = %Subscriber{
       full_name: "Alex",
@@ -102,7 +102,7 @@ defmodule Telephony.Core.PrepaidTest do
     subscriber_type = subscriber.subscriber_type
     calls = subscriber.calls
 
-    assert Invoice.print(subscriber_type, calls, 2023, 11) == %{
+    assert Invoice.print(subscriber_type, calls, 2023, 10) == %{
              calls: [
                %{
                  time_spent: 10,
