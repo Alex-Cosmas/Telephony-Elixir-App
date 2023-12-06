@@ -33,6 +33,52 @@ defmodule Telephony.Core.PostpaidTest do
 
     assert expect == result
   end
+
+  test "print invoice" do
+    date = ~D[2023-11-01]
+    last_month = ~D[2023-10-01]
+
+    subscriber = %Subscriber{
+      full_name: "Alex",
+      phone_number: "123",
+      subscriber_type: %Postpaid{spent: 90 * 1.04},
+      calls: [
+        %Call{
+          time_spent: 10,
+          date: date
+        },
+        %Call{
+          time_spent: 50,
+          date: last_month
+        },
+        %Call{
+          time_spent: 30,
+          date: last_month
+        }
+      ]
+    }
+
+    subsciber_type = subscriber.subscriber_type
+    calls = subscriber.calls
+
+    expect = %{
+      value_spent: 80 * 1.04,
+      calls: [
+        %{
+          time_spent: 50,
+          value_spent: 50 * 1.04,
+          date: last_month
+        },
+        %{
+          time_spent: 30,
+          time_spent: 30 * 1.04,
+          date: last_month
+        }
+      ]
+    }
+
+    assert expect == Invoice.print(subsciber_type, calls, 2022, 10)
+  end
 end
 
 # test "attempt to make a call", %{subscriber_without_credits: subscriber} do

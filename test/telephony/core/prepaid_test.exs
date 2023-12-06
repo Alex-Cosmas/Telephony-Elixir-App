@@ -118,7 +118,8 @@ defmodule Telephony.Core.PrepaidTest do
              recharges: [
                %Recharge{value: 100, date: last_month},
                %Recharge{value: 100, date: last_month}
-             ]
+             ],
+             credits: 253.6
            }
   end
 end
