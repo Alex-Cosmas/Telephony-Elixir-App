@@ -1,38 +1,17 @@
 defmodule Telephony.Core.Postpaid do
   alias Telephony.Core.Call
   defstruct spent: 0
-  @price_per_minute 1.04
 
-  def make_call(subscriber, time_spent, date) do
-    subscriber
-    |> update_spent(time_spent)
-    |> add_call(time_spent, date)
-  end
+  defimpl Subscriber, for: Telephony.Core.Postpaid do
+    @price_per_minute 1.04
 
-  def update_spent(%{subscriber_type: subscriber_type} = subscriber, time_spent) do
-    spent = @price_per_minute * time_spent
-    subscriber_type = %{subscriber_type | spent: subscriber_type.spent + spent}
-    %{subscriber | subscriber_type: subscriber_type}
-  end
+    def make_recharge(_, _, _) do
+      {:error, "Postpaid can't make a recharge"}
+    end
 
-  defp add_call(subscriber, time_spent, date) do
-    call = Call.new(time_spent, date)
-    %{subscriber | calls: subscriber.calls ++ [call]}
-  end
-
-  defimpl Invoice, for: Telephony.Core.Postpaid do
-    def print(_postpaid, calls, year, month) do
+    def print_invoice(_postpaid, calls, year, month) do
       calls =
-        Enum.reduce(calls, [], fn call, acc ->
-          if call.date.year == year and call.date.month == month do
-            value_spent = call.time_spent * 1.04
-            call = %{date: call.date, time_spent: call.time_spent, value_spent: value_spent}
-
-            acc ++ [call]
-          else
-            acc
-          end
-        end)
+        Enum.reduce(calls, [], &filter_calls(&1, &2, year, month))
 
       value_spent = Enum.reduce(calls, 0, &(&1.value_spent + &2))
 
@@ -40,6 +19,33 @@ defmodule Telephony.Core.Postpaid do
         value_spent: value_spent,
         calls: calls
       }
+    end
+
+    defp filter_calls(call, acc, year, month) do
+      if call.date.year == year and call.date.month == month do
+        value_spent = call.time_spent * 1.04
+        call = %{date: call.date, time_spent: call.time_spent, value_spent: value_spent}
+
+        acc ++ [call]
+      else
+        acc
+      end
+    end
+
+    def make_call(subscriber_type, time_spent, date) do
+      subscriber_type
+      |> update_spent(time_spent)
+      |> add_call(time_spent, date)
+    end
+
+    def update_spent(subscriber_type, time_spent) do
+      spent = @price_per_minute * time_spent
+      %{subscriber_type | spent: subscriber_type.spent + spent}
+    end
+
+    defp add_call(subscriber_type, time_spent, date) do
+      call = Call.new(time_spent, date)
+      {subscriber_type, call}
     end
   end
 end
