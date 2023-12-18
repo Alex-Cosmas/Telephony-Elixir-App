@@ -17,14 +17,16 @@ defmodule Telephony.Core.PostpaidTest do
 
   test "try to make a recharge" do
     postpaid = %Postpaid{spent: 90 * 1.04}
-    assert {:error, "sdsdf"} = Subscriber.make_recharge(postpaid, 100, Date.utc_today())
+
+    assert {:error, "Postpaid can't make a recharge"} ==
+             Subscriber.make_recharge(postpaid, 100, Date.utc_today())
   end
 
   test "print invoice" do
     date = ~D[2022-11-01]
     last_month = ~D[2022-10-01]
 
-    postpaid = %Postpaid{spent: 90 * 1.04}
+    postpaid = %Postpaid{spent: 80 * 1.04}
 
     calls = [
       %Call{
@@ -51,7 +53,7 @@ defmodule Telephony.Core.PostpaidTest do
         },
         %{
           time_spent: 30,
-          time_spent: 30 * 1.04,
+          value_spent: 30 * 1.04,
           date: last_month
         }
       ]
@@ -78,7 +80,7 @@ end
 #   expect = %Subscriber{
 #     full_name: "Alex",
 #     phone_number: "123",
-#     subscriber_type: %Prepaid{
+#     type: %Prepaid{
 #       credits: 110,
 #       recharges: [
 #         %Recharge{value: 100, date: date}
@@ -99,7 +101,7 @@ end
 # expect = %Telephony.Core.Subscriber{
 #   full_name: "Alex",
 #   phone_number: "123",
-#   subscriber_type: %Postpaid{spent: 2.08},
+#   type: %Postpaid{spent: 2.08},
 #   calls: [
 #     %Call{
 #       time_spent: 2,

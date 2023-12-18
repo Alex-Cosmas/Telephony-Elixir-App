@@ -9,14 +9,14 @@ defmodule Telephony.CoreTest do
       %Subscriber{
         full_name: "Gustavo",
         phone_number: "123",
-        subscriber_type: %Prepaid{credits: 0, recharges: []}
+        type: %Prepaid{credits: 0, recharges: []}
       }
     ]
 
     payload = %{
       full_name: "Gustavo",
       phone_number: "123",
-      subscriber_type: :prepaid
+      type: :prepaid
     }
 
     %{subscribers: subscribers, payload: payload}
@@ -31,7 +31,7 @@ defmodule Telephony.CoreTest do
       %Subscriber{
         full_name: "Gustavo",
         phone_number: "123",
-        subscriber_type: %Prepaid{credits: 0, recharges: []}
+        type: %Prepaid{credits: 0, recharges: []}
       }
     ]
 
@@ -42,7 +42,7 @@ defmodule Telephony.CoreTest do
     payload = %{
       full_name: "Joe",
       phone_number: "1234",
-      subscriber_type: :prepaid
+      type: :prepaid
     }
 
     result = Core.create_subscriber(subscribers, payload)
@@ -51,12 +51,12 @@ defmodule Telephony.CoreTest do
       %Subscriber{
         full_name: "Gustavo",
         phone_number: "123",
-        subscriber_type: %Prepaid{credits: 0, recharges: []}
+        type: %Prepaid{credits: 0, recharges: []}
       },
       %Subscriber{
         full_name: "Joe",
         phone_number: "1234",
-        subscriber_type: %Prepaid{credits: 0, recharges: []}
+        type: %Prepaid{credits: 0, recharges: []}
       }
     ]
 
@@ -64,7 +64,7 @@ defmodule Telephony.CoreTest do
   end
 
   test "display error, when subscriber already exist", %{payload: payload} do
-    payload = Map.put(payload, :subscriber_type, :already_subscribed)
+    payload = Map.put(payload, :type, :already_subscribed)
     result = Core.create_subscriber([], payload)
     assert {:error, "Only 'prepaid' or 'postpaid' are accepted"} == result
   end

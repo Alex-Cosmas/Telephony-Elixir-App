@@ -6,7 +6,7 @@ defmodule Telephony.Core.Prepaid do
   defimpl Subscriber, for: Telephony.Core.Prepaid do
     @price_per_minute 1.45
 
-    def print_invoice(%{recharges: recharges} = subscriber_type, calls, year, month) do
+    def print_invoice(%{recharges: recharges} = type, calls, year, month) do
       recharges = Enum.filter(recharges, &(&1.date.year == year and &1.date.month == month))
 
       calls =
@@ -24,13 +24,13 @@ defmodule Telephony.Core.Prepaid do
       %{
         recharges: recharges,
         calls: calls,
-        credits: subscriber_type.credits
+        credits: type.credits
       }
     end
 
-    def make_call(subscriber_type, time_spent, date) do
-      if is_subscriber_has_credits(subscriber_type, time_spent) do
-        subscriber_type
+    def make_call(type, time_spent, date) do
+      if is_subscriber_has_credits(type, time_spent) do
+        type
         |> update_credit_spent(time_spent)
         |> add_new_call(time_spent, date)
       else
@@ -38,27 +38,27 @@ defmodule Telephony.Core.Prepaid do
       end
     end
 
-    defp is_subscriber_has_credits(subscriber_type, time_spent) do
-      subscriber_type.credits >= @price_per_minute * time_spent
+    defp is_subscriber_has_credits(type, time_spent) do
+      type.credits >= @price_per_minute * time_spent
     end
 
-    defp update_credit_spent(subscriber_type, time_spent) do
+    defp update_credit_spent(type, time_spent) do
       credit_spent = @price_per_minute * time_spent
-      %{subscriber_type | credits: subscriber_type.credits - credit_spent}
+      %{type | credits: type.credits - credit_spent}
     end
 
-    defp add_new_call(subscriber_type, time_spent, date) do
+    defp add_new_call(type, time_spent, date) do
       call = Call.new(time_spent, date)
-      {subscriber_type, call}
+      {type, call}
     end
 
-    def make_recharge(subscriber_type, value, date) do
+    def make_recharge(type, value, date) do
       recharge = Recharge.new(value, date)
 
       %{
-        subscriber_type
-        | recharges: subscriber_type.recharges ++ [recharge],
-          credits: subscriber_type.credits + value
+        type
+        | recharges: type.recharges ++ [recharge],
+          credits: type.credits + value
       }
     end
   end

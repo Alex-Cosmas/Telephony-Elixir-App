@@ -1,49 +1,49 @@
 defprotocol Subscriber do
   @fallback_to_any true
-  def print_invoice(subscriber_type, calls, year, month)
-  def make_call(subscriber_type, time_spent, date)
-  def make_recharge(subscriber_type, value, date)
-  # def subscriber_type(subscriber_type)
+  def print_invoice(type, calls, year, month)
+  def make_call(type, time_spent, date)
+  def make_recharge(type, value, date)
+  # def type(type)
 end
 
 defmodule Telephony.Core.Subscriber do
   alias Telephony.Core.{Postpaid, Prepaid}
 
-  defstruct full_name: nil, phone_number: nil, subscriber_type: :prepaid, calls: []
+  defstruct full_name: nil, phone_number: nil, type: :prepaid, calls: []
 
-  def new(%{subscriber_type: :prepaid} = payload) do
-    payload = %{payload | subscriber_type: %Prepaid{}}
+  def new(%{type: :prepaid} = payload) do
+    payload = %{payload | type: %Prepaid{}}
     struct(__MODULE__, payload)
   end
 
-  def new(%{subscriber_type: :postpaid} = payload) do
-    payload = %{payload | subscriber_type: %Postpaid{}}
+  def new(%{type: :postpaid} = payload) do
+    payload = %{payload | type: %Postpaid{}}
     struct(__MODULE__, payload)
   end
 
   def make_call(subscriber, time_spent, date) do
-    case Subscriber.make_call(subscriber.subscriber_type, time_spent, date) do
+    case Subscriber.make_call(subscriber.type, time_spent, date) do
       {:error, message} ->
         {:error, message}
 
       {type, call} ->
-        %{subscriber | subscriber_type: type, calls: subscriber.calls ++ call}
+        %{subscriber | type: type, calls: subscriber.calls ++ call}
     end
   end
 end
 
-# def make_call(%{subscriber_type: subscriber_type} = subscriber, time_spent, date)
-#     when subscriber_type.__struct__ == Postpaid do
+# def make_call(%{type: type} = subscriber, time_spent, date)
+#     when type.__struct__ == Postpaid do
 #   Postpaid.make_call(subscriber, time_spent, date)
 # end
 
-# def make_call(%{subscriber_type: subscriber_type} = subscriber, time_spent, date)
-#     when subscriber_type.__struct__ == Prepaid do
+# def make_call(%{type: type} = subscriber, time_spent, date)
+#     when type.__struct__ == Prepaid do
 #   Prepaid.make_call(subscriber, time_spent, date)
 # end
 
-# def make_recharge(%{subscriber_type: subscriber_type} = subscriber, value, date)
-#     when subscriber_type.__struct__ == Prepaid do
+# def make_recharge(%{type: type} = subscriber, value, date)
+#     when type.__struct__ == Prepaid do
 #   Prepaid.make_recharge(subscriber, value, date)
 # end
 
@@ -57,5 +57,5 @@ end
 #   full_name: payload.full_name,
 #   id: payload.id,
 #   phone_number: payload.phone_number,
-#   subscriber_type: :prepaid
+#   type: :prepaid
 # }
